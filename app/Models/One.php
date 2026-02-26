@@ -11,15 +11,18 @@ class One extends Model
     /** @use HasFactory<\Database\Factories\OneFactory> */
     use HasFactory;
 
-    public function foos(): HasMany {
+    public function foos(): HasMany
+    {
         return $this->hasMany(Foo::class);
     }
 
-    public function bars(): HasMany {
+    public function bars(): HasMany
+    {
         return $this->hasMany(Bar::class);
     }
 
-    public function bazs(): HasMany {
+    public function bazs(): HasMany
+    {
         return $this->hasMany(Baz::class);
     }
 }

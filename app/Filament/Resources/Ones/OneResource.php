@@ -5,9 +5,9 @@ namespace App\Filament\Resources\Ones;
 use App\Filament\Resources\Ones\Pages\CreateOne;
 use App\Filament\Resources\Ones\Pages\EditOne;
 use App\Filament\Resources\Ones\Pages\ListOnes;
-use App\Filament\Resources\Ones\RelationManagers\FoosRelationManager;
 use App\Filament\Resources\Ones\RelationManagers\BarsRelationManager;
 use App\Filament\Resources\Ones\RelationManagers\BazsRelationManager;
+use App\Filament\Resources\Ones\RelationManagers\FoosRelationManager;
 use App\Filament\Resources\Ones\Schemas\OneForm;
 use App\Filament\Resources\Ones\Tables\OnesTable;
 use App\Models\One;
@@ -16,7 +16,6 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use League\CommonMark\Extension\Footnote\Parser\FootnoteStartParser;
 
 class OneResource extends Resource
 {
