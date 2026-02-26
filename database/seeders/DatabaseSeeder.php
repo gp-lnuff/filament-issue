@@ -2,6 +2,10 @@
 
 namespace Database\Seeders;
 
+use App\Models\Bar;
+use App\Models\Baz;
+use App\Models\Foo;
+use App\Models\One;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -21,5 +25,11 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@filamentphp.com',
         ]);
+
+        One::factory()
+            ->has(Foo::factory()->count(10))
+            ->has(Bar::factory()->count(10))
+            ->has(Baz::factory()->count(10))
+            ->create();
     }
 }
