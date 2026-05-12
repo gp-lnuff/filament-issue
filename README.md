@@ -1,59 +1,35 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+0.1) `git clone` and set up the reproduction repository by `install`ing `composer`  and `npm` dependencies
+0.2) `php artisan serve` the application, log into the precompiled user and navigate to the `Users` `Resource`
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+- Changing dynamic `Select` `options()` does not change `Select` `$state` (expected/intended(?))
 
-## About Laravel
+1) Create a new `User`
+2) Select an email from the dropdown
+3) Select a password from the dropdown
+4) "Create" to dump the form's raw state - make a note of the password field's value
+5) Select the other email from the dropdown - make a note of the password field's shown selected option
+6) "Create" to dump the form's raw state - observe unchanged password field's value
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+As an aside, the reproduction repository uses the form's `rawState()` because validation from `getState()` would catch that the unchanged password field's value is not valid.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- Manually managing `Select` `$state` keeps consistency between the `$state` and the shown selected option **when the dynamic options are different**
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+1) In `app/Filament/Resources/Users/Schemas/UserForm.php`, uncomment lines `30-33`
+2) Create a new `User`
+3) Select an email from the dropdown
+4) "Create" to dump the form's raw state
+5) Select the other email from the dropdown - make a note of the password field's shown selected option
+6) "Create" to dump the form's raw state - observe that state matches shown selected option
+7)  In `app/Filament/Resources/Users/Schemas/UserForm.php`, comment lines `30-33` again for the next steps
 
-## Learning Laravel
+- Manually managing `Select` `$state` does **not**  keep consistency between the `$state` and the shown selected option **when the dynamic options have a common value that shouldn't change**
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+1) In `app/Filament/Resources/Users/Schemas/UserForm.php`, uncomment lines `29`, `42` and `45`
+2) Create a new `User`
+3) Select an email from the dropdown
+4) "Create" to dump the form's raw state
+5) Select the other email from the dropdown - observe that the selected option changes
+6) "Create" to dump the form's raw state - observe that state does **not** match shown selected option
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-## Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This is naturally due to the fact that `$set`ting the `Select`'s `$state` to the common option when that is already the selected option is not a proper "update" and chances are some internals are not firing. I have confirmed that the `$shouldCallUpdatedHooks` on the `$set()` has no bearing on this.
+This case's behaviour is identical to the first case's behaviour - in fact, commenting line `29` again has no impact (granted the common option is manually selected the first time)
